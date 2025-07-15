@@ -69,7 +69,7 @@ public class Wrappers {
         for (WebElement product : productParentElements) {
             try {
              String title = product.findElement(By.xpath(".//div[contains(@class, 'KzDlHZ')]")).getText();
-             String discountText = product.findElement(By.xpath(".//span[contains(text(), '%')]")).getText();
+             String discountText = product.findElement(By.xpath(".//div[contains(@class, 'BfVC2z')]//div[contains(@class, 'UkUFwK')]")).getText();
             
 
             int discountValue = Integer.parseInt(discountText.replace("% off", " ").trim());
@@ -110,17 +110,20 @@ public class Wrappers {
             try {
                 String title = product.findElement(By.xpath(".//a[contains(@class, 'wjcEIp')]")).getText();
                 String imageUrl = product.findElement(By.xpath(".//img")).getAttribute("src");
-                String reviewText = product.findElement(By.xpath(".//span[contains(@class, 'Wphh3N')]")).getText();
-                int count = extractReviewCount(reviewText);
-                if (count > 0) {
-                    Map<String, String> info = new HashMap<>();
-                    info.put("title", title);
-                    info.put("imageUrl", imageUrl);
-                    info.put("count", String.valueOf(count));
-                    productInfo.add(info);
+                List<WebElement> reviewElements = product.findElements(By.xpath(".//span[contains(@class, 'Wphh3N')]"));
+                if(!reviewElements.isEmpty()) {
+                    String reviewText = reviewElements.get(0).getText();
+                    if(!reviewText.isEmpty()) {
+                        int count = extractReviewCount(reviewText);
+                        if (count > 0) {
+                            Map<String, String> info = new HashMap<>();
+                            info.put("title", title);
+                            info.put("imageUrl", imageUrl);
+                            info.put("count", String.valueOf(count));
+                            productInfo.add(info);
+                        }
+                    }
                 }
-
-
             } catch (Exception e) {
                 System.out.println("Test step: Error occured while processing product: " + e.getMessage());
             }
@@ -132,7 +135,7 @@ public class Wrappers {
                 Integer.parseInt(a.get("count"))));
         System.out.println("Test step: Top 5 coffee mugs by review count:");
 
-        for (int i = 0; i < Math.min(5, productInfo.size()); i++) {
+        for (int i = 0; i < 5; i++) {
             Map<String, String> info = productInfo.get(i);
             System.out.println("Title: " + info.get("title") + ", Image URL: " + info.get("imageUrl") + ", Reviews: "
                     + info.get("count"));
